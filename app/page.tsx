@@ -65,6 +65,8 @@ export default function WeddingPage() {
         <div className="max-w-md w-full">
           <p className="text-amber-500 text-xs uppercase tracking-[0.3em] mb-6 animate-pulse">Espace Privé</p>
           <h1 className="text-4xl md:text-6xl font-serif text-white mb-8">{DATA.couple}</h1>
+          <p className="mt-12 text-slate-2000 text-xs">Indice : Mot de passe démo: AMOUR2026</p>
+
           <form onSubmit={handleLogin} className="space-y-6">
             <input 
               type="password" 
@@ -78,7 +80,7 @@ export default function WeddingPage() {
               Entrer
             </button>
           </form>
-          <p className="mt-12 text-slate-600 text-xs">Indice : Regardez sur votre faire-part papier.</p>
+          <p className="mt-12 text-slate-600 text-xs">Indice : Regardez sur votre invitation</p>
         </div>
       </div>
     );
