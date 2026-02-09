@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { MapPin, Clock, Music, Heart, Mic, Camera, Gift, ChevronDown, Check, X, Navigation, Sparkles, Play, Calendar, Utensils, Baby, Volume2 } from 'lucide-react';
+import { MapPin, Clock, Music, Heart, Mic, Camera, Gift, ChevronDown, Check, X, Navigation, Sparkles, Play, Calendar, Utensils, Baby, Volume2, VolumeX } from 'lucide-react';
 
 // --- CONFIGURATION DU MARIAGE ---
 const DATA = {
@@ -11,6 +11,7 @@ const DATA = {
   date: "14 Août 2026",
   place: "Château de Chillon, Suisse",
   story: "Tout a commencé par un café renversé à la gare de Lausanne un matin d'hiver. Cinq ans, trois déménagements et mille éclats de rire plus tard, Thomas a posé un genou à terre au sommet des Diablerets.",
+  musicUrl: "https://drive.google.com/file/d/1P9jmmVoROTieZFyu_CqmjhrnuN8huQ2p/view?usp=sharing", // Exemple de musique libre
   images: {
     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1920&auto=format&fit=crop", 
     story: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop", 
@@ -88,8 +89,14 @@ export default function WeddingPage() {
 
   // SI CONNECTÉ -> LE SITE
   return (
-    <div ref={containerRef} className="bg-slate-950 text-slate-200 font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden">
+    <div ref={containerRef} className="bg-slate-950 text-slate-200 font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden relative">
       
+      {/* Ajout des particules scintillantes globales */}
+      <SparklesOverlay />
+      
+      {/* Lecteur Audio Flottant */}
+      <MusicPlayer />
+
       <Hero />
       
       {/* COMPTE A REBOURS ICI */}
@@ -194,7 +201,12 @@ export default function WeddingPage() {
          <MapPin className="w-10 h-10 text-amber-500 mx-auto mb-6" />
          <h2 className="text-3xl font-serif text-white mb-2">{DATA.place}</h2>
          <p className="text-slate-400 mb-8">Route du Lac 12, 1820 Veytaux, Suisse</p>
-         <button className="px-8 py-3 bg-white border border-slate-300 rounded-full hover:border-amber-500 hover:text-amber-500 transition-colors flex items-center gap-2 mx-auto uppercase text-xs font-bold tracking-widest shadow-sm text-black">
+         
+         {/* BOUTON GPS FONCTIONNEL */}
+         <button 
+           onClick={() => window.open("https://www.google.com/maps/dir/?api=1&destination=Château+de+Chillon,Veytaux,Suisse", "_blank")}
+           className="px-8 py-3 bg-white border border-slate-300 rounded-full hover:border-amber-500 hover:text-amber-500 transition-colors flex items-center gap-2 mx-auto uppercase text-xs font-bold tracking-widest shadow-sm text-black"
+         >
            <Navigation size={14} /> Lancer le GPS
          </button>
       </section>
@@ -224,9 +236,97 @@ export default function WeddingPage() {
 
 // --- SOUS-COMPOSANTS ---
 
+// Nouveau: Lecteur Musique
+function MusicPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-6 left-6 z-50">
+      <audio ref={audioRef} loop src={DATA.musicUrl} />
+      <button 
+        onClick={togglePlay}
+        className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-amber-500 hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
+      >
+        {isPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+      </button>
+    </div>
+  );
+}
+
+// Nouveau: Particules Scintillantes
+function SparklesOverlay() {
+  const particles = Array.from({ length: 25 });
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {particles.map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute bg-amber-200 rounded-full opacity-0"
+          style={{
+            width: Math.random() * 3 + 1 + 'px',
+            height: Math.random() * 3 + 1 + 'px',
+            top: Math.random() * 100 + '%',
+            left: Math.random() * 100 + '%',
+          }}
+          animate={{
+            opacity: [0, 0.8, 0],
+            scale: [0, 1.5, 0],
+          }}
+          transition={{
+            duration: Math.random() * 3 + 2,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 1000], [0, 500]);
+
+  // Plus de confetti spécifiques au Hero
+  useEffect(() => {
+    const end = Date.now() + 1500; // Durée du tir
+    const colors = ['#fbbf24', '#ffffff', '#f59e0b'];
+
+    (function frame() {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  }, []);
+
   return (
     <div className="relative h-screen w-full overflow-hidden flex items-center justify-center bg-black">
       <motion.div style={{ y }} className="absolute inset-0 z-0 opacity-70">
@@ -357,13 +457,31 @@ function Countdown() {
 function RsvpOverlay({ onClose }) {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  
+  // États pour la confirmation
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+    // Simulation d'envoi
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      // Fermeture automatique après 2.5 secondes
+      setTimeout(() => {
+        onClose();
+      }, 2500);
+    }, 1000);
+  };
 
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
     >
-      <div className="w-full max-w-2xl bg-white rounded-xl overflow-hidden shadow-2xl relative">
+      <div className="w-full max-w-2xl bg-white rounded-xl overflow-hidden shadow-2xl relative min-h-[400px] flex flex-col">
+        {/* EN TETE */}
         <div className="bg-[#1a1a1a] p-8 flex justify-between items-center text-white sticky top-0 z-10 border-b border-amber-500/30">
           <div>
             <h3 className="font-serif text-2xl text-amber-500">Confirmation de Présence</h3>
@@ -372,85 +490,110 @@ function RsvpOverlay({ onClose }) {
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X /></button>
         </div>
 
-        <div className="p-8 space-y-10 max-h-[80vh] overflow-y-auto bg-slate-50">
-          <section className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">1. Vos Coordonnées</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Prénom</label>
-                <input type="text" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="Jean" />
+        {/* CONTENU MODAL AVEC ETAT SUCCES */}
+        <AnimatePresence mode="wait">
+          {isSuccess ? (
+            <motion.div 
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50"
+            >
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <Check className="w-10 h-10 text-green-600" />
               </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Nom</label>
-                <input type="text" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="Dupont" />
-              </div>
-            </div>
-            <div>
-               <label className="block text-xs font-bold text-slate-500 mb-1">Email</label>
-               <input type="email" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="jean.dupont@email.com" />
-            </div>
-          </section>
+              <h3 className="text-2xl font-serif text-slate-900 mb-2">Réponse enregistrée !</h3>
+              <p className="text-slate-500">Nous avons hâte de vous voir.</p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="form"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="p-8 space-y-10 max-h-[80vh] overflow-y-auto bg-slate-50"
+            >
+              <section className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">1. Vos Coordonnées</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Prénom</label>
+                    <input type="text" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="Jean" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Nom</label>
+                    <input type="text" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="Dupont" />
+                  </div>
+                </div>
+                <div>
+                   <label className="block text-xs font-bold text-slate-500 mb-1">Email</label>
+                   <input type="email" className="w-full border border-slate-200 rounded-lg p-3 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all" placeholder="jean.dupont@email.com" />
+                </div>
+              </section>
 
-          <section className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">2. Nombre d'invités</h4>
-            <div className="flex items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-               <div>
-                 <span className="block font-bold text-slate-800 text-lg">Adultes</span>
-                 <span className="text-xs text-slate-400">Au dessus de 12 ans</span>
-               </div>
-               <div className="flex items-center gap-4 bg-slate-100 rounded-full p-1">
-                  <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-10 h-10 rounded-full bg-white border shadow-sm text-slate-600 hover:text-amber-600 font-bold transition-colors">-</button>
-                  <span className="font-serif text-xl w-8 text-center text-slate-900 font-bold">{adults}</span>
-                  <button onClick={() => setAdults(adults + 1)} className="w-10 h-10 rounded-full bg-slate-900 text-amber-500 shadow-sm hover:bg-black font-bold transition-colors">+</button>
-               </div>
-            </div>
-            <div className="flex items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600"><Baby size={20} /></div>
-                 <div>
-                   <span className="block font-bold text-slate-800 text-lg">Enfants</span>
-                   <span className="text-xs text-slate-400">Moins de 12 ans</span>
-                 </div>
-               </div>
-               <div className="flex items-center gap-4 bg-slate-100 rounded-full p-1">
-                  <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-10 h-10 rounded-full bg-white border shadow-sm text-slate-600 hover:text-amber-600 font-bold transition-colors">-</button>
-                  <span className="font-serif text-xl w-8 text-center text-slate-900 font-bold">{children}</span>
-                  <button onClick={() => setChildren(children + 1)} className="w-10 h-10 rounded-full bg-slate-900 text-amber-500 shadow-sm hover:bg-black font-bold transition-colors">+</button>
-               </div>
-            </div>
-            <AnimatePresence>
-              {children > 0 && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                   <input type="text" className="w-full border border-amber-300 bg-amber-50 rounded-lg p-4 text-sm focus:outline-none text-slate-900" placeholder="Prénoms et âges des enfants..." />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </section>
-
-          <section className="space-y-4">
-             <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">3. Participation</h4>
-             <div className="space-y-3">
-                {["Cérémonie & Vin d'Honneur (14h)", "Dîner de Gala (19h)", "Brunch du lendemain (11h)"].map((event, i) => (
-                  <label key={i} className="flex items-center gap-4 p-4 border border-slate-200 bg-white rounded-xl cursor-pointer hover:border-amber-400 transition-all shadow-sm">
-                     <div className="relative flex items-center">
-                       <input type="checkbox" defaultChecked className="peer w-6 h-6 border-2 border-slate-300 rounded-md checked:bg-amber-500 checked:border-amber-500 appearance-none transition-all cursor-pointer" />
-                       <Check className="absolute text-white w-4 h-4 pointer-events-none opacity-0 peer-checked:opacity-100 left-1 top-1" />
+              <section className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">2. Nombre d'invités</h4>
+                <div className="flex items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                   <div>
+                     <span className="block font-bold text-slate-800 text-lg">Adultes</span>
+                     <span className="text-xs text-slate-400">Au dessus de 12 ans</span>
+                   </div>
+                   <div className="flex items-center gap-4 bg-slate-100 rounded-full p-1">
+                      <button onClick={() => setAdults(Math.max(1, adults - 1))} className="w-10 h-10 rounded-full bg-white border shadow-sm text-slate-600 hover:text-amber-600 font-bold transition-colors">-</button>
+                      <span className="font-serif text-xl w-8 text-center text-slate-900 font-bold">{adults}</span>
+                      <button onClick={() => setAdults(adults + 1)} className="w-10 h-10 rounded-full bg-slate-900 text-amber-500 shadow-sm hover:bg-black font-bold transition-colors">+</button>
+                   </div>
+                </div>
+                <div className="flex items-center justify-between bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                   <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600"><Baby size={20} /></div>
+                     <div>
+                       <span className="block font-bold text-slate-800 text-lg">Enfants</span>
+                       <span className="text-xs text-slate-400">Moins de 12 ans</span>
                      </div>
-                     <span className="text-sm font-bold text-slate-700">{event}</span>
-                  </label>
-                ))}
-             </div>
-          </section>
+                   </div>
+                   <div className="flex items-center gap-4 bg-slate-100 rounded-full p-1">
+                      <button onClick={() => setChildren(Math.max(0, children - 1))} className="w-10 h-10 rounded-full bg-white border shadow-sm text-slate-600 hover:text-amber-600 font-bold transition-colors">-</button>
+                      <span className="font-serif text-xl w-8 text-center text-slate-900 font-bold">{children}</span>
+                      <button onClick={() => setChildren(children + 1)} className="w-10 h-10 rounded-full bg-slate-900 text-amber-500 shadow-sm hover:bg-black font-bold transition-colors">+</button>
+                   </div>
+                </div>
+                <AnimatePresence>
+                  {children > 0 && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                       <input type="text" className="w-full border border-amber-300 bg-amber-50 rounded-lg p-4 text-sm focus:outline-none text-slate-900" placeholder="Prénoms et âges des enfants..." />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </section>
 
-          <section className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">4. Préférences</h4>
-            <textarea className="w-full border border-slate-200 rounded-lg p-4 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none h-24 text-sm text-slate-900" placeholder="Allergies alimentaires, régime spécial..." />
-          </section>
+              <section className="space-y-4">
+                 <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">3. Participation</h4>
+                 <div className="space-y-3">
+                    {["Cérémonie & Vin d'Honneur (14h)", "Dîner de Gala (19h)", "Brunch du lendemain (11h)"].map((event, i) => (
+                      <label key={i} className="flex items-center gap-4 p-4 border border-slate-200 bg-white rounded-xl cursor-pointer hover:border-amber-400 transition-all shadow-sm">
+                         <div className="relative flex items-center">
+                           <input type="checkbox" defaultChecked className="peer w-6 h-6 border-2 border-slate-300 rounded-md checked:bg-amber-500 checked:border-amber-500 appearance-none transition-all cursor-pointer" />
+                           <Check className="absolute text-white w-4 h-4 pointer-events-none opacity-0 peer-checked:opacity-100 left-1 top-1" />
+                         </div>
+                         <span className="text-sm font-bold text-slate-700">{event}</span>
+                      </label>
+                    ))}
+                 </div>
+              </section>
 
-          <button className="w-full bg-slate-900 text-white font-bold py-5 rounded-xl hover:bg-black transition-all shadow-lg uppercase tracking-widest text-sm border-b-4 border-amber-600 active:border-b-0 active:translate-y-1">
-            Valider ma réponse
-          </button>
-        </div>
+              <section className="space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 border-b border-amber-200 pb-2">4. Préférences</h4>
+                <textarea className="w-full border border-slate-200 rounded-lg p-4 bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none h-24 text-sm text-slate-900" placeholder="Allergies alimentaires, régime spécial..." />
+              </section>
+
+              <button 
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full bg-slate-900 text-white font-bold py-5 rounded-xl hover:bg-black transition-all shadow-lg uppercase tracking-widest text-sm border-b-4 border-amber-600 active:border-b-0 active:translate-y-1 disabled:opacity-50"
+              >
+                {isSubmitting ? "Envoi en cours..." : "Valider ma réponse"}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
