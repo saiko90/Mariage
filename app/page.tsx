@@ -12,7 +12,7 @@ const DATA = {
   place: "Château de Chillon, Suisse",
   story: "Tout a commencé par un café renversé à la gare de Lausanne un matin d'hiver. Cinq ans, trois déménagements et mille éclats de rire plus tard, Thomas a posé un genou à terre au sommet des Diablerets.",
   // CORRECTION ICI : Lien direct Google Drive (uc?export=download)
-  musicUrl: "https://docs.google.com/uc?export=download&id=1P9jmmVoROTieZFyu_CqmjhrnuN8huQ2p", 
+  musicUrl: "/musique.mp3",
   images: {
     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1920&auto=format&fit=crop", 
     story: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop", 
