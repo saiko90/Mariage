@@ -11,13 +11,13 @@ const DATA = {
   date: "14 Août 2026",
   place: "Château de Chillon, Suisse",
   story: "Tout a commencé par un café renversé à la gare de Lausanne un matin d'hiver. Cinq ans, trois déménagements et mille éclats de rire plus tard, Thomas a posé un genou à terre au sommet des Diablerets.",
-  musicUrl: "https://drive.google.com/file/d/1P9jmmVoROTieZFyu_CqmjhrnuN8huQ2p/view?usp=sharing", // Exemple de musique libre
+  // CORRECTION ICI : Lien direct Google Drive (uc?export=download)
+  musicUrl: "https://docs.google.com/uc?export=download&id=1P9jmmVoROTieZFyu_CqmjhrnuN8huQ2p", 
   images: {
     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1920&auto=format&fit=crop", 
     story: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop", 
     party: "https://images.unsplash.com/photo-1530023367847-a683933f4172?q=80&w=1920&auto=format&fit=crop", 
     
-    // Galerie Mixte (Photos + Vocaux)
     galleryItems: [
       { type: 'photo', src: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=400&h=600&fit=crop" },
       { type: 'audio', author: "Mamie Rose", duration: "0:42" },
@@ -30,7 +30,6 @@ const DATA = {
 };
 
 export default function WeddingPage() {
-  // --- GESTION MOT DE PASSE ---
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -45,11 +44,9 @@ export default function WeddingPage() {
     }
   };
 
-  // --- ÉTATS DU SITE ---
   const [isRsvpOpen, setRsvpOpen] = useState(false);
   const containerRef = useRef(null);
 
-  // Effet Confetti au chargement (une fois authentifié)
   useEffect(() => {
     if (isAuthenticated) {
       const timer = setTimeout(() => {
@@ -59,7 +56,6 @@ export default function WeddingPage() {
     }
   }, [isAuthenticated]);
 
-  // SI PAS CONNECTÉ -> ÉCRAN LOGIN
   if (!isAuthenticated) {
     return (
       <div className="h-screen w-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
@@ -87,21 +83,15 @@ export default function WeddingPage() {
     );
   }
 
-  // SI CONNECTÉ -> LE SITE
   return (
     <div ref={containerRef} className="bg-slate-950 text-slate-200 font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden relative">
-      
-      {/* Ajout des particules scintillantes globales */}
       <SparklesOverlay />
       
-      {/* Lecteur Audio Flottant */}
+      {/* Le lecteur audio est ici, il se chargera dès que l'utilisateur est authentifié */}
       <MusicPlayer />
 
       <Hero />
-      
-      {/* COMPTE A REBOURS ICI */}
       <Countdown />
-      
       <SectionSeparator />
 
       {/* --- NOTRE HISTOIRE --- */}
@@ -134,7 +124,6 @@ export default function WeddingPage() {
       {/* --- LE PROGRAMME --- */}
       <section className="py-24 bg-slate-900 relative border-t border-slate-800 overflow-hidden">
          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 animate-pulse pointer-events-none" />
-         
          <div className="container mx-auto px-6 relative z-10 max-w-4xl">
             <SectionTitle subtitle="Déroulement" title="Le Programme" light={true} />
             <div className="mt-16 space-y-12">
@@ -146,19 +135,16 @@ export default function WeddingPage() {
          </div>
       </section>
 
-      {/* --- IMAGE PARALLAX --- */}
       <ParallaxSection image={DATA.images.party} text="Une nuit inoubliable" />
 
       {/* --- GALERIE MIXTE --- */}
       <section className="py-32 bg-slate-950 relative">
         <div className="container mx-auto px-6 max-w-6xl">
           <SectionTitle subtitle="Participation" title="Live Gallery & Livre d'Or" light={true} />
-          
           <div className="grid md:grid-cols-2 gap-6 mb-20">
             <ActionCard icon={<Mic className="w-8 h-8" />} title="Laissez un Vocal" desc="Un mot doux, une anecdote ou une chanson." label="Enregistrer" />
             <ActionCard icon={<Camera className="w-8 h-8" />} title="Partagez vos Photos" desc="Envoyez vos selfies et vidéos de la soirée." label="Uploader" />
           </div>
-
           <div className="columns-2 md:columns-4 gap-4 space-y-4">
             {DATA.images.galleryItems.map((item, i) => (
               <motion.div 
@@ -196,13 +182,10 @@ export default function WeddingPage() {
         </div>
       </section>
 
-      {/* --- INFO LIEU --- */}
       <section className="py-24 bg-gradient-to-b from-slate-900 to-slate-950 text-center">
          <MapPin className="w-10 h-10 text-amber-500 mx-auto mb-6" />
          <h2 className="text-3xl font-serif text-white mb-2">{DATA.place}</h2>
          <p className="text-slate-400 mb-8">Route du Lac 12, 1820 Veytaux, Suisse</p>
-         
-         {/* BOUTON GPS FONCTIONNEL */}
          <button 
            onClick={() => window.open("https://www.google.com/maps/dir/?api=1&destination=Château+de+Chillon,Veytaux,Suisse", "_blank")}
            className="px-8 py-3 bg-white border border-slate-300 rounded-full hover:border-amber-500 hover:text-amber-500 transition-colors flex items-center gap-2 mx-auto uppercase text-xs font-bold tracking-widest shadow-sm text-black"
@@ -211,7 +194,6 @@ export default function WeddingPage() {
          </button>
       </section>
 
-      {/* --- RSVP STICKY BAR --- */}
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-gradient-to-t from-black via-black/90 to-transparent pt-12 flex justify-center pointer-events-none">
         <motion.button 
           initial={{ y: 100 }} animate={{ y: 0 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -236,10 +218,33 @@ export default function WeddingPage() {
 
 // --- SOUS-COMPOSANTS ---
 
-// Nouveau: Lecteur Musique
+// Lecteur Musique modifié pour Autoplay
 function MusicPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  // On initialise isPlaying à TRUE pour l'interface
+  const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef(null);
+
+  // Tentative de lancement automatique dès l'affichage du composant
+  useEffect(() => {
+    if (audioRef.current) {
+      // On met le volume à 50% pour ne pas être trop agressif
+      audioRef.current.volume = 0.5;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Lecture automatique réussie !
+            setIsPlaying(true);
+          })
+          .catch((error) => {
+            // Lecture automatique bloquée par le navigateur
+            console.log("Autoplay empêché :", error);
+            setIsPlaying(false);
+          });
+      }
+    }
+  }, []); // Le tableau vide [] signifie "au montage du composant"
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -254,18 +259,33 @@ function MusicPlayer() {
 
   return (
     <div className="fixed bottom-6 left-6 z-50">
-      <audio ref={audioRef} loop src={DATA.musicUrl} />
+      {/* Ajout de l'attribut autoPlay */}
+      <audio ref={audioRef} loop autoPlay src={DATA.musicUrl} />
+      
       <button 
         onClick={togglePlay}
-        className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-amber-500 hover:bg-white/20 hover:scale-110 transition-all shadow-lg"
+        className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-amber-500 hover:bg-white/20 hover:scale-110 transition-all shadow-lg group relative"
       >
-        {isPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+        {/* Tooltip pour dire "Couper le son" si ça gêne */}
+        <span className="absolute left-14 bg-black/80 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+           {isPlaying ? "Couper la musique" : "Mettre la musique"}
+        </span>
+        
+        {isPlaying ? (
+           // Animation de l'onde sonore quand ça joue
+           <div className="flex gap-1 items-end h-4">
+             <motion.div animate={{ height: [4, 16, 4] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-1 bg-amber-500 rounded-full" />
+             <motion.div animate={{ height: [8, 12, 8] }} transition={{ repeat: Infinity, duration: 1.1 }} className="w-1 bg-amber-500 rounded-full" />
+             <motion.div animate={{ height: [4, 16, 4] }} transition={{ repeat: Infinity, duration: 0.9 }} className="w-1 bg-amber-500 rounded-full" />
+           </div>
+        ) : (
+           <VolumeX size={20} />
+        )}
       </button>
     </div>
   );
 }
 
-// Nouveau: Particules Scintillantes
 function SparklesOverlay() {
   const particles = Array.from({ length: 25 });
   return (
@@ -300,9 +320,8 @@ function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 1000], [0, 500]);
 
-  // Plus de confetti spécifiques au Hero
   useEffect(() => {
-    const end = Date.now() + 1500; // Durée du tir
+    const end = Date.now() + 1500;
     const colors = ['#fbbf24', '#ffffff', '#f59e0b'];
 
     (function frame() {
