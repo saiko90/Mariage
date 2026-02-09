@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import NeoCardFloatingBadge from './components/NeoCardFloatingBadge';
 import { MapPin, Clock, Music, Heart, Mic, Camera, Gift, ChevronDown, Check, X, Navigation, Sparkles, Play, Calendar, Utensils, Baby, Volume2, VolumeX } from 'lucide-react';
 
 // --- CONFIGURATION DU MARIAGE ---
@@ -79,6 +80,7 @@ export default function WeddingPage() {
           </form>
           <p className="mt-12 text-slate-600 text-xs">Indice : Regardez sur votre invitation</p>
         </div>
+        <NeoCardFloatingBadge theme="light" />
       </div>
     );
   }
@@ -89,6 +91,7 @@ export default function WeddingPage() {
       
       {/* Le lecteur audio est ici, il se chargera dès que l'utilisateur est authentifié */}
       <MusicPlayer />
+      <NeoCardFloatingBadge theme="light" />
 
       <Hero />
       <Countdown />
